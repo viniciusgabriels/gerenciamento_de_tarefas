@@ -1,0 +1,28 @@
+{
+  "todos": [
+    {
+      "id": "0ccf8d2d-94f9-4098-90eb-22103dae37b7",
+      "date": "2023-05-31T15:53:49.603Z",
+      "content": "Primeira TODO",
+      "done": false
+    },
+    {
+      "id": "1ced4c87-da5c-4a6b-8271-2f5838f138b4",
+      "date": "2023-05-31T15:53:49.605Z",
+      "content": "Segunda Todo",
+      "done": false
+    },
+    {
+      "id": "8fc196f3-6149-4b16-adc8-b1b700169c34",
+      "date": "2023-06-15T23:00:01.000Z",
+      "content": "Terceira Todo",
+      "done": false
+    },
+    {
+      "id": "4ea76387-5f64-4006-aee1-1a24cb59a364",
+      "date": "2023-06-15T19:12:01.758Z",
+      "content": "Quarta Todo",
+      "done": false
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "facilitasystem",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "author": "Vinícius Santos",
+  "description": "Projeto Sistema de Gerenciamento de Tarefas",
+  "keywords": [],
+  "license": "MIT",
+  "scripts": {
+    "start": "npx ts-node ./core/crud.ts",
+    "dev": "nodemon --ext ts,tsx --exec \"npm run start:crud\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongoose": "^8.3.2",
+    "typescript": "^5.4.5",
+    "uuid": "^9.0.1",
+    "zod": "^3.23.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@types/uuid": "^9.0.8",
+    "nodemon": "^3.1.0",
+    "prettier": "^3.2.5"
+  }
+}
