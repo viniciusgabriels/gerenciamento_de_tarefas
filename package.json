@@ -7,20 +7,37 @@
   "keywords": [],
   "license": "MIT",
   "scripts": {
-    "start": "npx ts-node ./core/crud.ts",
-    "dev": "nodemon --ext ts,tsx --exec \"npm run start:crud\"",
+    "start:crud": "npx ts-node ./core/crud.ts",
+    "dev:crud": "nodemon --ext ts,tsx --exec \"npm run start:crud\"",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint \"./**/*.{jsx,jsx,ts,tsx}\"",
+    "lint:fix": "npm run lint -- --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "express": "^4.19.2",
     "mongoose": "^8.3.2",
+    "next": "^14.2.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "typescript": "^5.4.5",
     "uuid": "^9.0.1",
     "zod": "^3.23.4"
   },
   "devDependencies": {
     "@types/node": "^20.12.7",
+    "@types/react": "18.2.79",
     "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.34.1",
     "nodemon": "^3.1.0",
     "prettier": "^3.2.5"
   }
