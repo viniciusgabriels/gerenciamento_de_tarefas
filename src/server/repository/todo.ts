@@ -1,19 +1,6 @@
-import {
-  read,
-  create,
-  update,
-  deleteById as dbDeleteById,
-} from "@db-crud-todo";
+import { supabase } from "@server/infra/db/supabase";
 import { HttpNotFoundError } from "@server/infra/errors";
-
-// SUPABASE
-// ===========
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.SUPABASE_URL || ""
-const supabaseKey = process.env.SUPABASE_SECRET_KEY || ""
-const supabase = createClient(supabaseUrl, supabaseKey)
-// ==========
+import { ITodo, TodoSchema } from "@server/schema/todo";
 
 interface ITodoRepositoryGetParams {
   page?: number;
@@ -30,61 +17,89 @@ async function get({
   page,
   limit,
 }: ITodoRepositoryGetParams = {}): Promise<ITodoRepositoryGetOutput> {
-  const { data, error, count } = await supabase.from("todos").select("*");
+  const currentPage = page || 1;
+  const currentLimit = limit || 10;
+  const startIndex = (currentPage - 1) * currentLimit;
+  const endIndex = currentPage * currentLimit - 1;
+
+  const { data, error, count } = await supabase
+    .from("todos")
+    .select("*", {
+      count: "exact",
+    })
+    .order("date", { ascending: false })
+    .range(startIndex, endIndex);
+
   if(error) throw new Error("Failed to fetch data");
 
-  const todos = data as ITodo[];
+  const parsedData = TodoSchema.array().safeParse(data);
+
+  if(!parsedData.success) {
+    throw new Error("Fail to parse TODO from database");
+  }
+
+  const todos = parsedData.data;
   const total = count || todos.length;
+  const totalPages = Math.ceil(total / currentLimit);
+
   return {
     todos,
     total,
-    pages:1
+    pages: totalPages
   }
-
-  // const currentPage = page || 1;
-  // const currentLimit = limit || 10;
-  // const ALL_TODOS = read().reverse();
-
-  // const startIndex = (currentPage - 1) * currentLimit;
-  // const endIndex = currentPage * currentLimit;
-  // const paginatedTodos = ALL_TODOS.slice(startIndex, endIndex);
-  // const totalPages = Math.ceil(ALL_TODOS.length / currentLimit);
-
-  // return {
-  //   total: ALL_TODOS.length,
-  //   todos: paginatedTodos,
-  //   pages: totalPages,
-  // };
 }
 
 async function createByContent(content: string): Promise<ITodo> {
-  const newTodo = create(content);
+  const { data, error } = await supabase.from("todos")
+    .insert([{ content, }])
+    .select()
+    .single();
 
-  return newTodo;
+  if(error) throw new Error("Failed to create todo");
+
+  const parsedData = TodoSchema.parse(data);
+  
+  return parsedData;
+}
+
+async function getTodoById(id: string): Promise<ITodo> {
+  const { data, error } = await supabase
+    .from("todos")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) throw new Error("Failed to get todo by id");
+
+  const parsedData = TodoSchema.safeParse(data);
+  if (!parsedData.success) throw new Error("Failed to parse TODO created");
+
+  return parsedData.data;
 }
 
 async function toggleDone(id: string): Promise<ITodo> {
-  const ALL_TODOS = read();
+  const todo = await getTodoById(id);
+  const { data, error } = await supabase.from("todos")
+    .update({ done: !todo.done })
+    .eq("id", id)
+    .select()
+    .single();
+  
+  if (error) throw new Error(`Failed to get todo by id "${id}"`);
 
-  const todo = ALL_TODOS.find((todo) => todo.id === id);
+  const parsedData = TodoSchema.safeParse(data);
+  if(!parsedData.success) {
+    throw new Error("Failed to return updated todo");
+  }
 
-  if (!todo) throw new Error(`Todo with id "${id}" not found`);
-
-  const updatedTodo = update(todo.id, {
-    done: !todo.done,
-  });
-
-  return updatedTodo;
+  return parsedData.data;
 }
 
 async function deleteById(id: string) {
-  const ALL_TODOS = read();
+  const { error } = await supabase.from("todos").delete()
+    .match({ id });
 
-  const todo = ALL_TODOS.find((todo) => todo.id === id);
-
-  if (!todo) throw new HttpNotFoundError(`Todo with id "${id}" not found`);
-
-  dbDeleteById(id);
+  if(error) throw new HttpNotFoundError(`Todo with id "${id}" not found`);
 }
 
 export const todoRepository = {
@@ -93,10 +108,3 @@ export const todoRepository = {
   toggleDone,
   deleteById,
 };
-
-interface ITodo {
-  id: string;
-  content: string;
-  date: string;
-  done: boolean;
-}
