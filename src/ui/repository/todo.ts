@@ -1,4 +1,4 @@
-import { z as schema } from "zod";
+import { z } from "zod";
 import { ITodo, TodoSchema } from "@ui/schema/todo";
 
 interface ITodoRepositoryGetParams {
@@ -43,7 +43,7 @@ export async function createByContent(content: string): Promise<ITodo> {
 
   if (response.ok) {
     const serverResponse = await response.json();
-    const ServerResponseSchema = schema.object({
+    const ServerResponseSchema = z.object({
       todo: TodoSchema,
     });
     const serverResponseParsed = ServerResponseSchema.safeParse(serverResponse);
@@ -64,7 +64,7 @@ async function toggleDone(todoId: string): Promise<ITodo> {
 
   if (response.ok) {
     const serverResponse = await response.json();
-    const ServerResponseSchema = schema.object({
+    const ServerResponseSchema = z.object({
       todo: TodoSchema,
     });
     const serverResponseParsed = ServerResponseSchema.safeParse(serverResponse);

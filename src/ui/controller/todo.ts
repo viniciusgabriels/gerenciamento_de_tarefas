@@ -1,6 +1,6 @@
 import { todoRepository } from "@ui/repository/todo";
 import { ITodo } from "@ui/schema/todo";
-import { z as schema } from "zod";
+import { z } from "zod";
 
 interface ITodoControllerGetParams {
   page: number;
@@ -33,7 +33,7 @@ interface ITodoControllerCreateParams {
 }
 
 function create({ content, onSuccess, onError }: ITodoControllerCreateParams) {
-  const parsedParams = schema.string().min(1).safeParse(content);
+  const parsedParams = z.string().min(1).safeParse(content);
   if (!parsedParams.success) {
     onError("Você precisa prover um conteúdo para criar uma TODO!");
     return;

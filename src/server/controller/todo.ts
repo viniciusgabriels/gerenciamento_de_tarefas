@@ -1,5 +1,5 @@
 import { todoRepository } from "@server/repository/todo";
-import { z as schema } from "zod";
+import { z } from "zod";
 import { NextApiRequest, NextApiResponse } from "next";
 import { HttpNotFoundError } from "@server/infra/errors";
 
@@ -22,7 +22,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const output = todoRepository.get({
+  const output = await todoRepository.get({
     page: page,
     limit: limit,
   });
@@ -34,8 +34,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-const TodoCreateBodySchema = schema.object({
-  content: schema.string(),
+const TodoCreateBodySchema = z.object({
+  content: z.string(),
 });
 
 async function create(req: NextApiRequest, res: NextApiResponse) {
@@ -87,8 +87,8 @@ async function toggleDone(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function deleteById(req: NextApiRequest, res: NextApiResponse) {
-  const QuerySchema = schema.object({
-    id: schema.string().uuid().min(1),
+  const QuerySchema = z.object({
+    id: z.string().uuid().min(1),
   });
 
   const parsedQuery = QuerySchema.safeParse(req.query);

@@ -1,10 +1,10 @@
-import { z as schema } from "zod";
+import { z } from "zod";
 
-export const TodoSchema = schema.object({
-  id: schema.string().uuid(),
-  content: schema.string().min(1),
-  date: schema.string().datetime(),
-  done: schema.boolean(),
+export const TodoSchema = z.object({
+  id: z.string().uuid(),
+  content: z.string().min(1),
+  date: z.string().datetime(),
+  done: z.boolean(),
 });
 
-export type ITodo = schema.infer<typeof TodoSchema>;
+export type ITodo = z.infer<typeof TodoSchema>;

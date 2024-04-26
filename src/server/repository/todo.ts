@@ -6,6 +6,15 @@ import {
 } from "@db-crud-todo";
 import { HttpNotFoundError } from "@server/infra/errors";
 
+// SUPABASE
+// ===========
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.SUPABASE_URL || ""
+const supabaseKey = process.env.SUPABASE_SECRET_KEY || ""
+const supabase = createClient(supabaseUrl, supabaseKey)
+// ==========
+
 interface ITodoRepositoryGetParams {
   page?: number;
   limit?: number;
@@ -17,24 +26,35 @@ interface ITodoRepositoryGetOutput {
   pages: number;
 }
 
-function get({
+async function get({
   page,
   limit,
-}: ITodoRepositoryGetParams = {}): ITodoRepositoryGetOutput {
-  const currentPage = page || 1;
-  const currentLimit = limit || 10;
-  const ALL_TODOS = read().reverse();
+}: ITodoRepositoryGetParams = {}): Promise<ITodoRepositoryGetOutput> {
+  const { data, error, count } = await supabase.from("todos").select("*");
+  if(error) throw new Error("Failed to fetch data");
 
-  const startIndex = (currentPage - 1) * currentLimit;
-  const endIndex = currentPage * currentLimit;
-  const paginatedTodos = ALL_TODOS.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(ALL_TODOS.length / currentLimit);
-
+  const todos = data as ITodo[];
+  const total = count || todos.length;
   return {
-    total: ALL_TODOS.length,
-    todos: paginatedTodos,
-    pages: totalPages,
-  };
+    todos,
+    total,
+    pages:1
+  }
+
+  // const currentPage = page || 1;
+  // const currentLimit = limit || 10;
+  // const ALL_TODOS = read().reverse();
+
+  // const startIndex = (currentPage - 1) * currentLimit;
+  // const endIndex = currentPage * currentLimit;
+  // const paginatedTodos = ALL_TODOS.slice(startIndex, endIndex);
+  // const totalPages = Math.ceil(ALL_TODOS.length / currentLimit);
+
+  // return {
+  //   total: ALL_TODOS.length,
+  //   todos: paginatedTodos,
+  //   pages: totalPages,
+  // };
 }
 
 async function createByContent(content: string): Promise<ITodo> {
